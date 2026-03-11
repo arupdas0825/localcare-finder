@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalCare Finder - Healthcare Nearby</title>
+    <!-- Google Fonts for Modern Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="fade-in">
+    <!-- Navbar -->
+    <nav class="navbar glass-nav">
+        <div class="logo">
+            <span class="icon">🏥</span> <span class="brand-text">LocalCare</span>
+        </div>
+        <div class="nav-controls">
+            <a href="/dashboard" class="nav-link"><span class="nav-icon">📊</span> Analytics</a>
+            <button id="themeToggle" class="btn-theme icon-btn tooltip" data-tooltip="Toggle Dark Mode">🌙</button>
+            <button id="emergencyBtnHome" class="btn-emergency pulse glow-effect">🚨 Emergency</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero hero-mesh">
+        <div class="hero-content slide-up">
+            <div class="hero-badge">Real-Time Open Data</div>
+            <h1 class="gradient-text">Find Vital Healthcare.<br>Exactly When You Need It.</h1>
+            <p class="hero-subtitle">Locate the closest Hospitals, Pharmacies, and Blood Banks in seconds with our lightning-fast, privacy-first locator.</p>
+            
+            <div class="search-box glass-panel floating">
+                <div class="input-group">
+                    <span class="input-icon">🔍</span>
+                    <input type="text" id="cityInput" placeholder="Enter your city name..." autocomplete="off">
+                </div>
+                
+                <button id="geoBtn" class="btn-icon tooltip geo-btn" data-tooltip="Auto-detect using GPS">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>
+                </button>
+                
+                <div class="divider"></div>
+                
+                <div class="select-wrapper">
+                    <select id="typeSelect">
+                        <option value="hospital">🏥 Hospitals</option>
+                        <option value="pharmacy">💊 Pharmacies</option>
+                        <option value="blood_bank">🩸 Blood Banks</option>
+                    </select>
+                </div>
+                
+                <button id="searchBtn" class="btn-primary btn-large">Find Nearby →</button>
+            </div>
+        </div>
+        
+        <!-- Subtle decorative shapes -->
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </header>
+
+    <!-- Main Features Layout -->
+    <section class="main-content grid-container fade-in-up delay-1">
+        
+        <!-- AI Symptom Assistant Widget -->
+        <div class="widget card ai-assistant hover-lift">
+            <div class="card-header highlight-header">
+                <div class="icon-circle bg-accent">🤖</div>
+                <h3>AI Health Assistant</h3>
+            </div>
+            <div class="card-body">
+                <p class="text-secondary">Not sure what facility you need? Describe your symptoms and let our AI route you to the right place.</p>
+                <div class="input-focus-wrapper">
+                    <textarea id="symptomInput" placeholder="E.g., 'I have a mild fever' or 'severe chest pain'..." rows="2"></textarea>
+                </div>
+                <div id="aiSuggestion" class="alert-box slide-down hidden"></div>
+            </div>
+        </div>
+
+        <!-- Health Resources -->
+        <div class="widget card health-resources hover-lift">
+            <div class="card-header">
+                <div class="icon-circle bg-success">📚</div>
+                <h3>Quick Resources</h3>
+            </div>
+            <div class="card-body resources-grid">
+                <a href="#" class="resource-item glass-interactive">
+                    <div class="r-icon">🚑</div>
+                    <div class="r-content">
+                        <h4>First Aid Basics</h4>
+                        <p>CPR guidelines & bleeding control.</p>
+                    </div>
+                </a>
+                <a href="#" class="resource-item glass-interactive">
+                    <div class="r-icon">🩸</div>
+                    <div class="r-content">
+                        <h4>Donate Blood</h4>
+                        <p>1 donation saves up to 3 lives.</p>
+                    </div>
+                </a>
+                <a href="#" class="resource-item glass-interactive">
+                    <div class="r-icon">🛡️</div>
+                    <div class="r-content">
+                        <h4>Poison Control</h4>
+                        <p>Immediate steps for toxic exposure.</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Favorites Panel -->
+        <div class="widget card favorites-panel hover-lift">
+            <div class="card-header">
+                <div class="icon-circle bg-warning">⭐</div>
+                <h3>Saved Locations</h3>
+            </div>
+            <div class="card-body">
+                <ul id="favoritesList" class="fav-list custom-scrollbar">
+                    <li class="empty-state pulse-soft">
+                        <div class="empty-icon">📍</div>
+                        <p>No favorites yet.</p>
+                        <span>Star places in your search results to keep them handy here!</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Modern Emergency Modal -->
+    <div id="emergencyModal" class="modal hidden blur-backdrop">
+        <div class="modal-content emergency-board scale-in">
+            <button class="close-btn modal-close">&times;</button>
+            <div class="modal-header panic-header">
+                <div class="siren-wrapper">
+                    <span class="siren">🚨</span>
+                    <div class="siren-ring"></div>
+                </div>
+                <h2>CRITICAL CONTACTS</h2>
+                <div class="pulse-line"></div>
+            </div>
+            
+            <div class="emergency-location-banner" id="emergencyContext">
+                <span class="spinner-small"></span> Locating local dispatch...
+            </div>
+            
+            <div id="emergencyData" class="contact-grid stagger-children">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen Modern Loader -->
+    <div id="globalSpinner" class="loader-overlay hidden blur-backdrop">
+        <div class="modern-loader">
+            <div class="loader-circle"></div>
+            <div class="loader-cross"></div>
+        </div>
+        <h2 class="loader-text gradient-text">Acquiring Satellites...</h2>
+        <p class="loader-sub">Securing your coordinate data</p>
+    </div>
+
+    <script src="/static/js/script.js"></script>
+</body>
+</html>
