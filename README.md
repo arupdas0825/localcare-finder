@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/arupdas0825/localcare-finder/main/static/icons/hospital-icon.svg" width="80" alt="LocalCare Finder Logo">
+  <img src="static/icons/logo.png" width="120" style="border-radius: 20px;" alt="LocalCare Finder Logo">
   <h1>🏥 LocalCare Finder</h1>
   <p><strong>Find Vital Healthcare. Exactly When You Need It.</strong></p>
 
