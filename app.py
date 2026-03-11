@@ -1,9 +1,21 @@
 import os
 import datetime
+import logging
+from logging.handlers import RotatingFileHandler
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flask_cors import CORS
 from config import Config, DevelopmentConfig, ProductionConfig
-from services.location_service import geocode_city, fetch_nearby_places, sort_by_distance, get_emergency_contacts
+from services.location_service import geocode_location, fetch_nearby_places, sort_by_distance, get_emergency_contacts, get_cached_result, set_cached_result
+import hashlib
+
+# Setup file logger for geospatial search tracking
+log_dir = os.path.join(os.path.dirname(__file__), 'logs')
+os.makedirs(log_dir, exist_ok=True)
+search_logger = logging.getLogger('search_logger')
+search_logger.setLevel(logging.INFO)
+file_handler = RotatingFileHandler(os.path.join(log_dir, 'search.log'), maxBytes=2000000, backupCount=5)
+file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+search_logger.addHandler(file_handler)
 
 app = Flask(__name__)
 
@@ -64,51 +76,74 @@ def dashboard():
 @app.route('/search', methods=['POST'])
 def search():
     """Legacy/Form post fallback if needed. Frontend predominantly uses Fetch/AJAX."""
+    locality = request.form.get('locality')
     city = request.form.get('city')
     service_type = request.form.get('type')
-    return redirect(url_for('results', city=city, type=service_type))
+    return redirect(url_for('results', locality=locality, city=city, type=service_type))
 
 @app.route('/api/nearby', methods=['GET'])
 def api_nearby():
     """
     Main API endpoint to fetch nearby healthcare facilities.
-    Accepts: ?city=Name OR ?lat=x&lon=y, ?type=hospital|pharmacy|blood_bank, ?radius=5000
+    Accepts: ?locality=Name, ?city=Name OR ?lat=x&lon=y, ?type=hospital|pharmacy|blood_bank
     """
-    city = request.args.get('city')
+    locality = request.args.get('locality', '')
+    city = request.args.get('city', '')
     lat = request.args.get('lat')
     lon = request.args.get('lon')
     service_type = request.args.get('type', 'hospital')
-    radius = int(request.args.get('radius', 5000))
 
     # Log analytics
-    record_analytics(city, service_type)
+    record_analytics(city or locality, service_type)
 
     if not lat or not lon:
-        if not city:
-            return jsonify({'error': 'Please provide a city name or latitude and longitude.'}), 400
+        if not locality and not city:
+            return jsonify({'error': 'Please provide a location/city name or latitude and longitude.'}), 400
         
-        # Geocode city to coordinates
-        lat, lon = geocode_city(city)
+        # Geocode location to coordinates (Dual-strategy)
+        lat, lon = geocode_location(locality, city)
         if not lat or not lon:
-            return jsonify({'error': 'City not found or could not be geocoded.'}), 404
+            # Bug 3 constraint: never show error to user, but we can't show a map if we don't know where they are.
+            # Assuming client side validation prevents this usually.
+            return jsonify({'error': 'Location not found in India database.'}), 404
 
     try:
         lat, lon = float(lat), float(lon)
     except ValueError:
         return jsonify({'error': 'Invalid latitude or longitude format.'}), 400
 
+    # Feature 5: Check Cache
+    query_str = f"{lat}_{lon}_{service_type}"
+    query_hash = hashlib.md5(query_str.encode('utf-8')).hexdigest()
+    
+    cached_data = get_cached_result(query_hash)
+    if cached_data:
+        return jsonify({
+            'center': {'lat': lat, 'lon': lon},
+            'results': cached_data['results'],
+            'radius_used': cached_data['radius'],
+            'cached': True
+        }), 200
+
     # Map the service type to OSM tags
     osm_type = service_type
     if service_type == 'blood_bank':
         osm_type = 'blood_bank'
 
-    # Fetch and process places
-    places = fetch_nearby_places(lat, lon, osm_type, radius)
+    # Fetch and process places (with progressive radius)
+    places, final_radius = fetch_nearby_places(lat, lon, osm_type)
+    
+    # Bug 1 constraint: Never throw 404 for zero results. Return 200 with empty array so UI can show the Map empty state.
     sorted_places = sort_by_distance(places, lat, lon)
+
+    # Save to cache
+    set_cached_result(query_hash, {'results': sorted_places, 'radius': final_radius})
 
     return jsonify({
         'center': {'lat': lat, 'lon': lon},
-        'results': sorted_places
+        'results': sorted_places,
+        'radius_used': final_radius,
+        'cached': False
     }), 200
 
 @app.route('/api/emergency', methods=['GET'])

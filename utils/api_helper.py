@@ -1,8 +1,9 @@
 import requests
 import logging
+import re
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('api_helper')
 
 def safe_get(url, params=None, timeout=10, retries=3):
     """
@@ -10,7 +11,7 @@ def safe_get(url, params=None, timeout=10, retries=3):
     Crucial for interacting with external APIs securely.
     """
     headers = {
-        'User-Agent': 'LocalCareFinder/1.0 (admin@localcarefinder.com)'
+        'User-Agent': 'LocalCareFinder/3.0 (admin@localcarefinder.com)'
     }
     
     for attempt in range(retries):
@@ -31,7 +32,7 @@ def safe_get(url, params=None, timeout=10, retries=3):
 def build_overpass_query(lat, lon, amenity_type, radius=5000):
     """
     Build the syntax for Overpass QL depending on the requested health facility.
-    OpenStreetMap tags its keys distinctly (amenity=hospital vs healthcare=blood_donation).
+    Massively expanded to cover all common tagging conventions in India.
     """
     if amenity_type == 'blood_bank':
         query = f"""
@@ -39,17 +40,43 @@ def build_overpass_query(lat, lon, amenity_type, radius=5000):
         (
           node["healthcare"="blood_donation"](around:{radius},{lat},{lon});
           way["healthcare"="blood_donation"](around:{radius},{lat},{lon});
-          relation["healthcare"="blood_donation"](around:{radius},{lat},{lon});
+          
+          node["amenity"="blood_bank"](around:{radius},{lat},{lon});
+          way["amenity"="blood_bank"](around:{radius},{lat},{lon});
+          
+          node["healthcare"="blood_bank"](around:{radius},{lat},{lon});
+          node["amenity"="blood_donation"](around:{radius},{lat},{lon});
+          
+          node["amenity"]["name"~"Blood Bank|Rakta|Blood Centre",i](around:{radius},{lat},{lon});
+          node["healthcare"]["name"~"Blood Bank|Rakta|Blood Centre",i](around:{radius},{lat},{lon});
         );
         out center;
         """
     elif amenity_type == 'pharmacy':
+        # Pharmacy / Medical Stores logic for India
         query = f"""
         [out:json][timeout:25];
         (
           node["amenity"="pharmacy"](around:{radius},{lat},{lon});
           way["amenity"="pharmacy"](around:{radius},{lat},{lon});
-          relation["amenity"="pharmacy"](around:{radius},{lat},{lon});
+          
+          node["amenity"="chemist"](around:{radius},{lat},{lon});
+          
+          node["shop"="chemist"](around:{radius},{lat},{lon});
+          way["shop"="chemist"](around:{radius},{lat},{lon});
+          
+          node["shop"="pharmacy"](around:{radius},{lat},{lon});
+          
+          node["shop"="medical_supply"](around:{radius},{lat},{lon});
+          way["shop"="medical_supply"](around:{radius},{lat},{lon});
+          
+          node["amenity"="medical_store"](around:{radius},{lat},{lon});
+          
+          node["healthcare"="pharmacy"](around:{radius},{lat},{lon});
+          way["healthcare"="pharmacy"](around:{radius},{lat},{lon});
+          
+          node["shop"]["name"~"Medical|Pharma|Chemist|Medicals|Drug",i](around:{radius},{lat},{lon});
+          node["amenity"]["name"~"Medical|Pharma|Chemist|Medicals|Drug",i](around:{radius},{lat},{lon});
         );
         out center;
         """
@@ -59,9 +86,20 @@ def build_overpass_query(lat, lon, amenity_type, radius=5000):
         (
           node["amenity"="hospital"](around:{radius},{lat},{lon});
           way["amenity"="hospital"](around:{radius},{lat},{lon});
-          relation["amenity"="hospital"](around:{radius},{lat},{lon});
+          
           node["amenity"="clinic"](around:{radius},{lat},{lon});
           way["amenity"="clinic"](around:{radius},{lat},{lon});
+          
+          node["amenity"="doctors"](around:{radius},{lat},{lon});
+          node["amenity"="health_centre"](around:{radius},{lat},{lon});
+          
+          node["healthcare"="hospital"](around:{radius},{lat},{lon});
+          way["healthcare"="hospital"](around:{radius},{lat},{lon});
+          
+          node["healthcare"="clinic"](around:{radius},{lat},{lon});
+          way["healthcare"="clinic"](around:{radius},{lat},{lon});
+          
+          node["building"="hospital"](around:{radius},{lat},{lon});
         );
         out center;
         """
@@ -69,7 +107,9 @@ def build_overpass_query(lat, lon, amenity_type, radius=5000):
 
 def parse_overpass_response(response_json):
     """
-    Extract useful and normalized structure (lat, lon, name, address) from complex OSM data output.
+    Extract useful and normalized structure from complex OSM data output.
+    Adds metadata for ranking algorithms (has_name, address_completeness).
+    Extracts phone and opening_hours if available.
     """
     places = []
     if not response_json or 'elements' not in response_json:
@@ -81,19 +121,27 @@ def parse_overpass_response(response_json):
         lon = element.get('lon') or (element.get('center', {}).get('lon'))
         tags = element.get('tags', {})
         
-        # Name
-        name = tags.get('name', tags.get('name:en', 'Unknown Facility'))
+        type_str = tags.get('amenity', tags.get('healthcare', tags.get('shop', 'Facility'))).title()
+        type_str = type_str.replace('_', ' ')
         
+        name = tags.get('name', tags.get('name:en', ''))
+        has_name = 1
+        if not name:
+            name = f"Unnamed {type_str}"
+            has_name = 0
+            
         # Address concatenation
         addr_housenumber = tags.get('addr:housenumber', '')
         addr_street = tags.get('addr:street', '')
         addr_city = tags.get('addr:city', '')
+        addr_postcode = tags.get('addr:postcode', '')
         
-        address_parts = [p for p in [addr_housenumber, addr_street, addr_city] if p]
+        address_parts = [p for p in [addr_housenumber, addr_street, addr_city, addr_postcode] if p]
         address = ", ".join(address_parts) if address_parts else "Address not available"
+        address_completeness = len(address_parts)
         
-        # Check visually open filter potential (opening_hours)
-        opening_hours = tags.get('opening_hours', 'Unknown')
+        opening_hours = tags.get('opening_hours', '')
+        phone = tags.get('phone', tags.get('contact:phone', ''))
         
         if lat and lon:
             places.append({
@@ -102,8 +150,11 @@ def parse_overpass_response(response_json):
                 'address': address,
                 'lat': lat,
                 'lon': lon,
-                'type': tags.get('amenity', tags.get('healthcare', 'facility')),
-                'opening_hours': opening_hours
+                'type': type_str,
+                'opening_hours': opening_hours,
+                'phone': phone,
+                'has_name': has_name,
+                'address_completeness': address_completeness
             })
             
     return places

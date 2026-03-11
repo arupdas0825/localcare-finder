@@ -310,6 +310,32 @@ body.dark .hero-badge { border-color: rgba(59, 130, 246, 0.3); }
     pointer-events: none;
 }
 
+/* Autocomplete Dropdown */
+.autocomplete-dropdown {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    width: 100%;
+    max-height: 250px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-lg);
+    overflow-y: auto;
+    z-index: 1000;
+}
+.autocomplete-dropdown.hidden { display: none !important; }
+.autocomplete-item {
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    transition: var(--transition-fast);
+}
+.autocomplete-item:last-child { border-bottom: none; }
+.autocomplete-item:hover { background: var(--surface-hover); }
+.autocomplete-title { font-weight: 600; color: var(--text-primary); margin-bottom: 0.2rem;}
+.autocomplete-desc { font-size: 0.8rem; color: var(--text-secondary); }
+
 .geo-btn { background: var(--surface-hover); border: 1px solid var(--border); border-radius: 50%; width: 45px; height: 45px; margin-right: 0.5rem;}
 .geo-btn svg { color: var(--primary); }
 
@@ -461,8 +487,11 @@ body.dark .f-type { background: rgba(13, 148, 136, 0.15); }
 .f-address-icon { margin-top: 0.1rem; }
 
 .f-actions { display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px dashed var(--border); }
-.dist-badge { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.2rem; color: var(--text-primary); }
-.dist-badge span { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; font-family: 'Inter', sans-serif; }
+.dist-badge { flex:1; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.3rem;}
+.dist-badge span { font-size: 0.8rem; font-weight: 600; padding: 0.1rem 0.5rem; border-radius: 4px; }
+.badge-green span { background: var(--accent-light); color: var(--success); }
+.badge-yellow span { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+.badge-red span { background: var(--danger-light); color: var(--danger); body.dark & { background: rgba(239, 68, 68, 0.1); } }
 
 .btn-sm { padding: 0.5rem 1rem; font-size: 0.85rem; border-radius: var(--border-radius-sm); }
 .btn-sm-primary { background: var(--primary); color: white; display:flex; align-items:center; gap:0.4rem;}
@@ -478,6 +507,12 @@ body.dark .f-type { background: rgba(13, 148, 136, 0.15); }
     padding: 0;
 }
 .custom-leaflet-popup .leaflet-popup-tip { background: var(--surface); border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); }
+
+/* Custom Map Marker Hues */
+.marker-hospital div { background-color: var(--danger) !important; border-color: white !important; }
+.marker-pharmacy div { background-color: var(--success) !important; border-color: white !important; }
+.marker-blood_bank div { background-color: #7f1d1d !important; border-color: white !important; }
+.marker-hospital .marker-icon { background: transparent !important; color: white; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;}
 .popup-inner { padding: 1rem; }
 .popup-inner h4 { margin-bottom: 0.3rem; font-size: 1rem; }
 .popup-inner p { margin-bottom: 0.8rem; font-size: 0.85rem; color: var(--text-secondary); }

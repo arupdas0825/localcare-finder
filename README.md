@@ -23,9 +23,11 @@ By leveraging real-time OpenStreetMap APIs and intelligent location-based search
 ## 🚀 Features
 
 - **🔍 Smart Search:** Instantly locate healthcare services by inputting a city name.
-- **📍 Auto-Location Detection:** One-click GPS mapping finds services precisely around your current coordinates.
-- **🗺️ Interactive Glassmorphism Map:** Explore dynamic markers and clusters via a premium Leaflet.js interface.
-- **🏥 Comprehensive Coverage:** Pinpoint nearby Hospitals, Pharmacies, Clinics, and Blood Banks.
+- **🇮🇳 Pan-India Dual Input Engine:** Search simultaneously by `Locality` and `City`, pulling from a comprehensive `data/india_cities.json` local fallback index.
+- **🎯 Progressive Radius Expansion:** Overpass API sweeps gracefully from 300m out to 10km, resolving precisely when 3+ facilities are found, preventing rate-limit and gateway timeout bans.
+- **📍 Auto-Location Detection:** One-click GPS mapping finds services precisely around your current coordinates natively via Reverse Geocoding.
+- **🗺️ Interactive Glassmorphism Map:** Explore dynamic colored markers and clusters via a premium Leaflet.js interface (Red=Hospitals, Green=Pharmacies, Dark Red=Blood Banks).
+- **🏥 Comprehensive Coverage:** Pinpoint nearby Hospitals, Pharmacies, Clinics, and Blood Banks using localized OSM syntax matching.
 - **🚑 Live Emergency Mode:** One-tap access to critical regional dispatch contacts (Ambulance, Police, Fire).
 - **⭐ Persistent Favorites:** Save preferred locations directly to browser `localStorage` for quick access.
 - **🤖 AI Symptom Assistant:** Integrated NLP routing suggests the right facility based on typed symptoms.

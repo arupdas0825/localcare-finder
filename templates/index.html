@@ -29,17 +29,31 @@
             <h1 class="gradient-text">Find Vital Healthcare.<br>Exactly When You Need It.</h1>
             <p class="hero-subtitle">Locate the closest Hospitals, Pharmacies, and Blood Banks in seconds with our lightning-fast, privacy-first locator.</p>
             
-            <div class="search-box glass-panel floating">
-                <div class="input-group">
-                    <span class="input-icon">🔍</span>
-                    <input type="text" id="cityInput" placeholder="Enter your city name..." autocomplete="off">
+            <div class="search-box glass-panel floating" style="flex-direction: column; align-items: stretch; padding: 1.5rem; border-radius: 20px;">
+                <!-- Dual Input Row -->
+                <div style="display: flex; gap: 1rem; width: 100%; margin-bottom: 1rem; flex-wrap: wrap;">
+                    <!-- Locality Input -->
+                    <div class="input-group" style="position: relative; flex: 1; min-width: 250px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--border-radius-sm); padding-left: 1rem;">
+                        <span class="input-icon">📍</span>
+                        <input type="text" id="localityInput" placeholder="Locality / Area (e.g. Salt Lake)" autocomplete="off">
+                        <div id="autocompleteLocality" class="autocomplete-dropdown hidden"></div>
+                    </div>
+                    
+                    <!-- City Input -->
+                    <div class="input-group" style="position: relative; flex: 1; min-width: 250px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--border-radius-sm); padding-left: 1rem;">
+                        <span class="input-icon">🏙️</span>
+                        <input type="text" id="cityInput" placeholder="City (e.g. Kolkata)" autocomplete="off">
+                        <div id="autocompleteCity" class="autocomplete-dropdown hidden"></div>
+                    </div>
                 </div>
-                
-                <button id="geoBtn" class="btn-icon tooltip geo-btn" data-tooltip="Auto-detect using GPS">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>
-                </button>
-                
-                <div class="divider"></div>
+
+                <!-- Controls Row -->
+                <div style="display: flex; gap: 1rem; width: 100%; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                    
+                    <button id="geoBtn" class="btn-outline tooltip geo-btn" data-tooltip="Reverse geocode auto-fill" style="width: auto; border-radius: var(--border-radius-sm); display: flex; align-items: center; gap: 0.5rem; justify-content: center; padding: 0.8rem 1rem;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <span>Use My Location</span>
+                    </button>
                 
                 <div class="select-wrapper">
                     <select id="typeSelect">
