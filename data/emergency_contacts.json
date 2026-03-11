@@ -1,0 +1,84 @@
+{
+    "cities": [
+        {
+            "name": "New York",
+            "ambulance": "911",
+            "police": "911",
+            "fire_brigade": "911",
+            "poison_control": "1-800-222-1222",
+            "nearest_hospital": "Bellevue Hospital Center"
+        },
+        {
+            "name": "Los Angeles",
+            "ambulance": "911",
+            "police": "911",
+            "fire_brigade": "911",
+            "poison_control": "1-800-222-1222",
+            "nearest_hospital": "Cedars-Sinai Medical Center"
+        },
+        {
+            "name": "London",
+            "ambulance": "999",
+            "police": "999",
+            "fire_brigade": "999",
+            "poison_control": "111",
+            "nearest_hospital": "St Thomas' Hospital"
+        },
+        {
+            "name": "Toronto",
+            "ambulance": "911",
+            "police": "911",
+            "fire_brigade": "911",
+            "poison_control": "1-800-268-9017",
+            "nearest_hospital": "Toronto General Hospital"
+        },
+        {
+            "name": "Sydney",
+            "ambulance": "000",
+            "police": "000",
+            "fire_brigade": "000",
+            "poison_control": "13 11 26",
+            "nearest_hospital": "Royal Prince Alfred Hospital"
+        },
+        {
+            "name": "Mumbai",
+            "ambulance": "108",
+            "police": "100",
+            "fire_brigade": "101",
+            "poison_control": "104",
+            "nearest_hospital": "King Edward Memorial Hospital"
+        },
+        {
+            "name": "Berlin",
+            "ambulance": "112",
+            "police": "110",
+            "fire_brigade": "112",
+            "poison_control": "030 19240",
+            "nearest_hospital": "Charité - Universitätsmedizin"
+        },
+        {
+            "name": "Tokyo",
+            "ambulance": "119",
+            "police": "110",
+            "fire_brigade": "119",
+            "poison_control": "072-727-2499",
+            "nearest_hospital": "The University of Tokyo Hospital"
+        },
+        {
+            "name": "Paris",
+            "ambulance": "15",
+            "police": "17",
+            "fire_brigade": "18",
+            "poison_control": "01 40 05 48 48",
+            "nearest_hospital": "Hôpital Universitaire Pitié Salpêtrière"
+        },
+        {
+            "name": "Dubai",
+            "ambulance": "998",
+            "police": "999",
+            "fire_brigade": "997",
+            "poison_control": "800-424",
+            "nearest_hospital": "Rashid Hospital"
+        }
+    ]
+}
