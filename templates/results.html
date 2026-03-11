@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - LocalCare Finder</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+</head>
+<body class="results-page fade-in">
+    <!-- Navbar -->
+    <nav class="navbar glass-nav border-bottom">
+        <div class="logo">
+            <a href="/" class="brand-link"><span class="icon">🏥</span> <span class="brand-text">LocalCare</span></a>
+        </div>
+        <div class="nav-controls">
+            <button id="themeToggle" class="btn-theme icon-btn tooltip" data-tooltip="Toggle Mode">🌙</button>
+            <button id="emergencyBtnResults" class="btn-emergency pulse glow-effect">🚨 Emergency</button>
+        </div>
+    </nav>
+
+    <!-- Results Layout Container -->
+    <div class="results-layout slide-up-fast">
+        
+        <!-- Left Side: Interactive Map -->
+        <div class="map-container shadow-right">
+            <div id="map"></div>
+            <!-- Custom map overlay control for refreshing/centering -->
+            <button id="recenterBtn" class="map-overlay-btn shadow-md tooltip-left" data-tooltip="Recenter Map">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+        </div>
+        
+        <!-- Right Side: Facilities List -->
+        <div class="list-container custom-scrollbar">
+            
+            <div class="smart-filters glass-panel-sticky shadow-sm">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="filterDistance" class="filter-label">Radius</label>
+                        <div class="select-wrapper small-select">
+                            <select id="filterDistance">
+                                <option value="50">Unlimited</option>
+                                <option value="1">Under 1 km</option>
+                                <option value="5">Under 5 km</option>
+                                <option value="10">Under 10 km</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group toggle-group">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="filterOpen">
+                            <span class="slider round"></span>
+                        </label>
+                        <span class="filter-label">Open Now</span>
+                    </div>
+                </div>
+                
+                <div class="summary-pill fade-in" id="resultSummary">
+                    <span class="pulse-dot"></span> Searching...
+                </div>
+            </div>
+            
+            <!-- Sleek inline loading skeleton -->
+            <div id="loadingSpinner" class="skeleton-container">
+                <div class="skeleton-card">
+                    <div class="skel-header"><div class="skel-title"></div><div class="skel-icon"></div></div>
+                    <div class="skel-line"></div><div class="skel-line short"></div>
+                    <div class="skel-footer"><div class="skel-btn"></div><div class="skel-btn small"></div></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skel-header"><div class="skel-title"></div><div class="skel-icon"></div></div>
+                    <div class="skel-line"></div><div class="skel-line short"></div>
+                    <div class="skel-footer"><div class="skel-btn"></div><div class="skel-btn small"></div></div>
+                </div>
+            </div>
+
+            <div id="resultsGrid" class="results-grid hidden stagger-fade">
+                <!-- Cards injected here dynamically via JS -->
+            </div>
+            
+            <!-- Empty state fallback -->
+            <div id="noResults" class="empty-state-large hidden fade-in">
+                <div class="empty-illustration">🔍</div>
+                <h3>No Facilities Found</h3>
+                <p class="text-secondary">We couldn't find locations matching your exact criteria in this vicinity.</p>
+                <div class="empty-actions">
+                    <button id="resetFiltersBtn" class="btn-outline">Clear Filters</button>
+                    <a href="/" class="btn-primary">Try Another City</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Emergency Modal (Shared UI) -->
+    <div id="emergencyModal" class="modal hidden blur-backdrop">
+        <div class="modal-content emergency-board scale-in">
+            <button class="close-btn modal-close">&times;</button>
+            <div class="modal-header panic-header">
+                <div class="siren-wrapper">
+                    <span class="siren">🚨</span>
+                    <div class="siren-ring"></div>
+                </div>
+                <h2>CRITICAL CONTACTS</h2>
+                <div class="pulse-line"></div>
+            </div>
+            
+            <div class="emergency-location-banner" id="emergencyContext">
+                <span class="spinner-small"></span> Locating local dispatch...
+            </div>
+            
+            <div id="emergencyData" class="contact-grid stagger-children"></div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="/static/js/script.js"></script>
+</body>
+</html>
