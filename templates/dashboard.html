@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - LocalCare Finder</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-page">
+    <!-- Navbar -->
+    <nav class="navbar solid-nav">
+        <div class="logo">
+            <a href="/">🏥 Admin Dashboard</a>
+        </div>
+        <div class="nav-controls">
+            <a href="/" class="nav-link">Back to Home</a>
+            <button id="themeToggle" class="btn-theme">🌙 Mode</button>
+        </div>
+    </nav>
+
+    <div class="dashboard-content grid-container">
+        
+        <div class="dashboard-header align-center">
+            <h1>Platform Analytics</h1>
+            <p>Real-time insights on search queries and performance.</p>
+        </div>
+
+        <section class="stats-overview">
+            <div class="stat-card blue-gradient">
+                <h3>Total Searches</h3>
+                <h2 id="totalSearchesCount">0</h2>
+                <div class="stat-icon">🔍</div>
+            </div>
+            <div class="stat-card purple-gradient">
+                <h3>Most Searched City</h3>
+                <h2 id="topCityName">-</h2>
+                <div class="stat-icon">🏙️</div>
+            </div>
+            <div class="stat-card green-gradient">
+                <h3>Popular Service Type</h3>
+                <h2 id="topServiceName">-</h2>
+                <div class="stat-icon">🏥</div>
+            </div>
+        </section>
+
+        <section class="charts-section">
+            <div class="chart-container card">
+                <div class="card-header">
+                    <h3>Top 5 Searched Cities</h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="citiesChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="recent-searches-section card">
+            <div class="card-header">
+                <h3>Recent Activity Log</h3>
+            </div>
+            <div class="card-body scroll-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>City / Origin</th>
+                            <th>Service Category</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentTableBody">
+                        <tr>
+                            <td colspan="3" style="text-align: center;">Loading data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+    </div>
+
+    <script src="/static/js/script.js"></script>
+</body>
+</html>
